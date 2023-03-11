@@ -16,4 +16,8 @@
 
 out/
 
-.idea
+# SQLite database files
+*.db
+
+Air tmp folder
+/tmp
