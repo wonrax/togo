@@ -6,10 +6,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/go-chi/chi"
 	_ "github.com/mattn/go-sqlite3"
-	togo "github.com/wonrax/togo/src"
-	"github.com/wonrax/togo/src/middleware"
+	togo "github.com/wonrax/togo/internal"
 	"go.uber.org/zap"
 )
 
@@ -22,32 +20,19 @@ func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	// INIT LOGGER
-	err := togo.InitLogger()
-	if err != nil {
-		log.Fatal("Could not init logger")
-	}
-
 	// DATABASE INITIALIZATION
 	db, err := sql.Open("sqlite3", "togo.db")
 	if err != nil {
-		togo.Log.Fatal("Cannot open sqlite database", zap.Error(err))
+		log.Fatal("Cannot open sqlite database", zap.Error(err))
 	}
 	defer db.Close()
 
+	togo.InitGlobalConfig(db)
+
 	// DATABASE MIGRATION
-	togo.DBMigrate(db)
+	togo.DBMigrate()
 
 	// ROUTING
-	r := chi.NewRouter()
-	r.Use(middleware.New(togo.Log, nil))
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello World!"))
-	})
-	r.Get("/{id}", func(w http.ResponseWriter, r *http.Request) {
-		id := chi.URLParam(r, "id")
-		w.Write([]byte(id))
-	})
-	http.ListenAndServe(":3000", r)
-
+	togo.Log.Info("Starting server on port 3000")
+	http.ListenAndServe(":3000", togo.CreateRouter())
 }

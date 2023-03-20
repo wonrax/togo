@@ -1,7 +1,6 @@
 package togo
 
 import (
-	"database/sql"
 	"fmt"
 
 	"go.uber.org/zap"
@@ -12,7 +11,7 @@ type migration struct {
 	sql  string
 }
 
-func DBMigrate(db *sql.DB) {
+func DBMigrate() {
 	migrations := []migration{
 		{
 			name: "init db",
@@ -30,7 +29,7 @@ func DBMigrate(db *sql.DB) {
 	}
 
 	for i, m := range migrations {
-		result, err := db.Exec(m.sql)
+		result, err := Db.Exec(m.sql)
 		if err != nil {
 			Log.Panic("Database migration failed, stopping...", zap.Error(err))
 		}
