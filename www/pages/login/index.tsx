@@ -39,5 +39,7 @@ async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     },
     body: JSON.stringify({ username, password }),
   })
-  console.log(await response.json())
+  if (response.status === 200) {
+    location.href = "/todos"
+  }
 }

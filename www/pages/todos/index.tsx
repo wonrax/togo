@@ -1,12 +1,12 @@
 // TODO prevent flash when mutate optimistically
 // sort the data server side so the client doesn't have to do it
 
-import { useRef } from "react"
 import useSWR, { useSWRConfig } from "swr"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 
 const fetcher = (url: string) =>
@@ -14,7 +14,7 @@ const fetcher = (url: string) =>
     method: "GET",
     credentials: "include",
   }).then(async (res) => {
-    await new Promise((r) => setTimeout(r, 2000))
+    await new Promise((r) => setTimeout(r, 1000))
     return res.json()
   })
 
@@ -39,7 +39,7 @@ export default function TodosPage() {
               data: [
                 ...response.data,
                 {
-                  id: response.data.length + 1,
+                  id: response.data.length + 2,
                   title: e.currentTarget["todo-title"].value,
                   description: e.currentTarget.description.value,
                   created_at: new Date().toISOString(),
@@ -92,7 +92,7 @@ async function handleTodoSubmit(
   e.preventDefault()
   const title = e.currentTarget["todo-title"].value
   const description = e.currentTarget.description.value
-  await new Promise((r) => setTimeout(r, 2000))
+  await new Promise((r) => setTimeout(r, 1000))
   return await fetch("http://localhost:3000/todos", {
     method: "PUT",
     headers: {
@@ -127,11 +127,18 @@ function Todos({ todos, error, isLoading }) {
 
 function Todo({ todo }) {
   return (
-    <div className="p-4 rounded-md border shadow-sm flex flex-col gap-2">
+    <div className="p-4 rounded-lg border shadow-sm flex flex-col gap-2">
       {todo.title && <h5 className="font-bold">{todo.title}</h5>}
-      {todo.description && (
-        <p className="break-words break-all">{todo.description}</p>
-      )}
+      <p>
+        {todo.updated_at && (
+          <span className="text-sm text-gray-300">
+            {new Date(todo.updated_at).toLocaleDateString("vi-VN") + " "}
+          </span>
+        )}
+        {todo.description && (
+          <span className="break-words break-all">{todo.description}</span>
+        )}
+      </p>
     </div>
   )
 }
