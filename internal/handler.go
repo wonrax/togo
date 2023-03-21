@@ -357,7 +357,7 @@ func HandleGetTodoList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var todos []TodoResponse
+	var todos = []TodoResponse{}
 	err := Db.Select(&todos, "SELECT * FROM todos WHERE owner = ?", userId)
 	if err != nil {
 		Log.Error("Could not get todo list", zap.Error(err))
