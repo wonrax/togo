@@ -1,25 +1,24 @@
 package togo
 
 import (
-	"database/sql"
-
+	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
 // Global configuration
 
-var Db *sql.DB
+var Db *sqlx.DB
 var Log *zap.Logger
 var basicAuthConfig *BasicAuthConfig
 
-func InitGlobalConfig(d *sql.DB) {
+func InitGlobalConfig(d *sqlx.DB) {
 	initDb(d)
 	initLogger()
 	initBasicAuthConfig()
 }
 
-func initDb(d *sql.DB) {
+func initDb(d *sqlx.DB) {
 	Db = d
 }
 

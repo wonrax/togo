@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 )
 
@@ -327,9 +326,8 @@ func HandleCreateTodo(w http.ResponseWriter, r *http.Request) {
 	lastInsertId, _ := result.LastInsertId()
 	Log.Debug("Last insert ID", zap.Int64("lastInsertId", lastInsertId))
 
-	sqlxDb := sqlx.NewDb(Db, "sqlite3")
 	var insertedTodo TodoResponse
-	err = sqlxDb.Get(&insertedTodo, "SELECT * FROM todos WHERE id = ?", lastInsertId)
+	err = Db.Get(&insertedTodo, "SELECT * FROM todos WHERE id = ?", lastInsertId)
 	if err != nil {
 		Log.Error("Could not get inserted todo", zap.Error(err))
 		Render(w, r, Response{
@@ -345,5 +343,34 @@ func HandleCreateTodo(w http.ResponseWriter, r *http.Request) {
 		HTTPStatusCode: http.StatusOK,
 		Data:           insertedTodo,
 		StatusText:     "Todo created",
+	})
+}
+
+func HandleGetTodoList(w http.ResponseWriter, r *http.Request) {
+	userId, err_ := r.Context().Value(userIdContextKey{}).(int64)
+	if !err_ {
+		Log.Error(
+			"Could not get user ID from context",
+			zap.Any("username", r.Context().Value(userIdContextKey{})),
+		)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	var todos []TodoResponse
+	err := Db.Select(&todos, "SELECT * FROM todos WHERE owner = ?", userId)
+	if err != nil {
+		Log.Error("Could not get todo list", zap.Error(err))
+		Render(w, r, Response{
+			HTTPStatusCode: http.StatusBadRequest,
+			StatusText:     "Could not get todo list",
+		})
+		return
+	}
+
+	Render(w, r, Response{
+		HTTPStatusCode: http.StatusOK,
+		Data:           todos,
+		StatusText:     "success",
 	})
 }

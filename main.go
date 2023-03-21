@@ -1,11 +1,11 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
 
+	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
 	togo "github.com/wonrax/togo/internal"
 	"go.uber.org/zap"
@@ -21,7 +21,7 @@ func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	// DATABASE INITIALIZATION
-	db, err := sql.Open("sqlite3", "togo.db")
+	db, err := sqlx.Open("sqlite3", "togo.db")
 	if err != nil {
 		log.Fatal("Cannot open sqlite database", zap.Error(err))
 	}
