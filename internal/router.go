@@ -5,18 +5,27 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/cors"
 )
 
 func CreateRouter() *chi.Mux {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:8081"}, // Use this to allow specific origin hosts
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: true,
+		MaxAge:           300, // Maximum value not ignored by any of major browsers
+	}))
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Hello World!"))
 	})
 
 	r.Post("/signup", HandleUserSignup)
-	r.Get("/login", HandleUserLogin)
+	r.Post("/login", HandleUserLogin)
 
 	// Protected routes
 	r.Route("/", func(r chi.Router) {

@@ -10,10 +10,7 @@ import (
 	"go.uber.org/zap"
 )
 
-var wrongAuthHeaderFormat = Response{
-	HTTPStatusCode: http.StatusBadRequest,
-	StatusText:     "Invalid Authorization header. Format is 'Basic <base64 encoded username:password>'.",
-}
+const CookieAuthKey = "AuthToken"
 
 type userIdContextKey struct{}
 
@@ -155,29 +152,39 @@ func HandleUserLogin(w http.ResponseWriter, r *http.Request) {
 	token := base64.StdEncoding.EncodeToString(
 		[]byte(*userLoginRequest.Username + ":" + *userLoginRequest.Password))
 
+	// Set browser cookie
+	cookie := http.Cookie{
+		Name:     CookieAuthKey,
+		Value:    token,
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+	}
+
 	Render(w, r, Response{
 		HTTPStatusCode: http.StatusOK,
-		Data:           map[string]string{"token": token},
+		Cookie:         &cookie,
 		StatusText:     "Login successful",
 	})
 }
 
 func HandleAuthorizeRoute(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		auth := r.Header.Get("Authorization")
-		Log.Debug("Authorization requested", zap.String("Authorization header", auth))
-
-		authStr := strings.Split(auth, "Basic ")
-		if len(authStr) != 2 {
-			Log.Info("Invalid Authorization header")
-			Render(w, r, wrongAuthHeaderFormat)
+		authToken, err := r.Cookie("AuthToken")
+		if err != nil {
+			Render(w, r, Response{
+				HTTPStatusCode: http.StatusUnauthorized,
+				StatusText:     "Unauthorized",
+			})
 			return
 		}
 
-		rawDecodedText, err := base64.StdEncoding.DecodeString(authStr[1])
+		Log.Debug("Authorization requested", zap.Any("Authorization cookie", authToken))
+
+		rawDecodedText, err := base64.StdEncoding.DecodeString(authToken.Value)
 		if err != nil {
-			Log.Info("Could not decode Authorization header", zap.Error(err))
-			Render(w, r, wrongAuthHeaderFormat)
+			Log.Info("Could not decode Authorization token", zap.Error(err))
+			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 

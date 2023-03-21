@@ -9,7 +9,8 @@ import (
 var ErrUnsupportedContentType = errors.New("unsupported content type")
 
 type Response struct {
-	HTTPStatusCode int `json:"-"` // http response status code
+	HTTPStatusCode int          `json:"-"` // http response status code
+	Cookie         *http.Cookie `json:"-"` // http response cookie
 
 	Data       interface{} `json:"data,omitempty"`
 	StatusText string      `json:"status"`          // user-level status message
@@ -19,6 +20,10 @@ type Response struct {
 func Render(w http.ResponseWriter, r *http.Request, response Response) {
 	if response.HTTPStatusCode == 0 {
 		response.HTTPStatusCode = http.StatusOK
+	}
+
+	if response.Cookie != nil {
+		http.SetCookie(w, response.Cookie)
 	}
 
 	w.Header().Set("Content-Type", "application/json")

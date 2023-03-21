@@ -3,7 +3,6 @@ package togo
 import (
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 )
 
 // Global configuration
@@ -20,16 +19,6 @@ func InitGlobalConfig(d *sqlx.DB) {
 
 func initDb(d *sqlx.DB) {
 	Db = d
-}
-
-func initLogger() error {
-	var logConfig = zap.NewDevelopmentConfig()
-	logConfig.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
-
-	var err error
-	Log, err = logConfig.Build()
-
-	return err
 }
 
 func initBasicAuthConfig() {
