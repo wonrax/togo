@@ -20,7 +20,9 @@ func DBMigrate() {
 					id INTEGER PRIMARY KEY,
 					username TEXT NOT NULL,
 					hashed_password TEXT NOT NULL,
-					password_salt TEXT NOT NULL
+					password_salt TEXT NOT NULL,
+					created_at TEXT NOT NULL,
+					updated_at TEXT NOT NULL
 				);
 				CREATE UNIQUE INDEX IF NOT EXISTS
 					idx_users_username ON users (username);
