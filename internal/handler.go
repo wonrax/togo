@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 )
 
@@ -268,5 +269,81 @@ func HandleGetUserInfo(w http.ResponseWriter, r *http.Request) {
 		HTTPStatusCode: http.StatusOK,
 		Data:           user[0],
 		StatusText:     "success",
+	})
+}
+
+func HandleCreateTodo(w http.ResponseWriter, r *http.Request) {
+	userId, err_ := r.Context().Value(userIdContextKey{}).(int64)
+	if !err_ {
+		Log.Error(
+			"Could not get user ID from context",
+			zap.Any("username", r.Context().Value(userIdContextKey{})),
+		)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	var todoRequest TodoRequest
+	err := Bind(r, &todoRequest)
+	if err != nil {
+		Log.Error("Could not bind request body", zap.Error(err))
+		Render(w, r, Response{
+			HTTPStatusCode: http.StatusBadRequest,
+			StatusText:     "Could not read request body",
+		})
+		return
+	}
+
+	Log.Debug("Todo request", zap.Any("todoRequest", todoRequest), zap.Int64("userId", userId))
+
+	if todoRequest.Title == nil && todoRequest.Description == nil {
+		Render(w, r, Response{
+			HTTPStatusCode: http.StatusBadRequest,
+			StatusText:     "Both title and description are empty",
+		})
+		return
+	}
+
+	timestamp := time.Now().UTC().Format(time.RFC3339)
+
+	todoRequest.CreatedAt = &timestamp
+	todoRequest.UpdatedAt = &timestamp
+	todoRequest.Owner = &userId
+
+	result, err := DbInsert(
+		todoRequest,
+		"todos",
+	)
+	Log.Debug("Todo insert result", zap.Any("result", result))
+	if err != nil {
+		Log.Error("Could not insert todo", zap.Error(err))
+		Render(w, r, Response{
+			HTTPStatusCode: http.StatusBadRequest,
+			StatusText:     "Could not insert todo",
+		})
+		return
+	}
+
+	lastInsertId, _ := result.LastInsertId()
+	Log.Debug("Last insert ID", zap.Int64("lastInsertId", lastInsertId))
+
+	sqlxDb := sqlx.NewDb(Db, "sqlite3")
+	var insertedTodo TodoResponse
+	err = sqlxDb.Get(&insertedTodo, "SELECT * FROM todos WHERE id = ?", lastInsertId)
+	if err != nil {
+		Log.Error("Could not get inserted todo", zap.Error(err))
+		Render(w, r, Response{
+			HTTPStatusCode: http.StatusOK,
+			StatusText:     "Todo created",
+		})
+		return
+	}
+
+	Log.Debug("Inserted todo", zap.Any("insertedTodo", insertedTodo))
+
+	Render(w, r, Response{
+		HTTPStatusCode: http.StatusOK,
+		Data:           insertedTodo,
+		StatusText:     "Todo created",
 	})
 }

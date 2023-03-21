@@ -2,12 +2,32 @@ package togo
 
 import (
 	"database/sql"
+	"encoding/json"
+	"errors"
 	"fmt"
 
 	"go.uber.org/zap"
 )
 
-func DbInsert(data map[string]interface{}, table string) (result sql.Result, err error) {
+func DbInsert(_data any, table string) (result sql.Result, err error) {
+	if _data == nil {
+		err = errors.New("data is nil")
+		return
+	}
+
+	data, ok := _data.(map[string]any)
+	if !ok {
+		Log.Debug("Data is not a map, trying to unmarshal it", zap.Any("data", _data))
+		inrec, err_ := json.Marshal(_data)
+		if err_ != nil {
+			return nil, err_
+		}
+		err_ = json.Unmarshal(inrec, &data)
+		if err != nil {
+			return nil, err_
+		}
+	}
+
 	args := make([]interface{}, 0, len(data))
 	keys := make([]string, 0, len(data))
 	valPlaceholder := ""
