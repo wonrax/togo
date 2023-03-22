@@ -4,9 +4,11 @@ import (
 	"context"
 	"encoding/base64"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
+	"github.com/go-chi/chi"
 	"go.uber.org/zap"
 )
 
@@ -400,5 +402,43 @@ func HandleGetTodoList(w http.ResponseWriter, r *http.Request) {
 		HTTPStatusCode: http.StatusOK,
 		Data:           todos,
 		StatusText:     "success",
+	})
+}
+
+func HandleDeleteTodo(w http.ResponseWriter, r *http.Request) {
+	userId, err_ := r.Context().Value(userIdContextKey{}).(int64)
+	if !err_ {
+		Log.Error(
+			"Could not get user ID from context",
+			zap.Any("username", r.Context().Value(userIdContextKey{})),
+		)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	todoIdStr := chi.URLParam(r, "id")
+	todoId, err := strconv.ParseInt(todoIdStr, 10, 64)
+	if err != nil {
+		Log.Error("Could not parse todo ID", zap.Error(err))
+		Render(w, r, Response{
+			HTTPStatusCode: http.StatusBadRequest,
+			StatusText:     "Could not parse todo ID",
+		})
+		return
+	}
+
+	_, err = Db.Exec("DELETE FROM todos WHERE id = ? AND owner = ?", todoId, userId)
+	if err != nil {
+		Log.Error("Could not delete todo", zap.Error(err))
+		Render(w, r, Response{
+			HTTPStatusCode: http.StatusBadRequest,
+			StatusText:     "Could not delete todo",
+		})
+		return
+	}
+
+	Render(w, r, Response{
+		HTTPStatusCode: http.StatusOK,
+		StatusText:     "Todo deleted",
 	})
 }

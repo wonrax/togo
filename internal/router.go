@@ -36,6 +36,7 @@ func CreateRouter() *chi.Mux {
 		r.Get("/me", HandleGetUserInfo)
 		r.Put("/todos", HandleCreateTodo)
 		r.Get("/todos", HandleGetTodoList)
+		r.Delete("/todos/{id}", HandleDeleteTodo)
 	})
 
 	return r

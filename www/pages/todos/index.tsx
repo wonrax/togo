@@ -5,7 +5,6 @@ import useSWR, { useSWRConfig } from "swr"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 
@@ -14,7 +13,6 @@ const fetcher = (url: string) =>
     method: "GET",
     credentials: "include",
   }).then(async (res) => {
-    await new Promise((r) => setTimeout(r, 1000))
     if (res.status === 401) {
       location.href = "/login"
     }
@@ -100,7 +98,6 @@ async function handleTodoSubmit(
   e.preventDefault()
   const title = e.currentTarget["todo-title"].value
   const description = e.currentTarget.description.value
-  await new Promise((r) => setTimeout(r, 1000))
   return await fetch("http://localhost:3000/todos", {
     method: "PUT",
     headers: {
@@ -119,7 +116,8 @@ function Todos({ todos, error, isLoading }) {
         Failed to fetch todos. {JSON.stringify(error)}
       </div>
     )
-  if (!todos) return null
+  if (!todos) return <p>You don't have any todo! Create one!</p>
+  if (!todos.length) return <p>You don't have any todo! Create one!</p>
   todos.sort(
     (a, b) =>
       new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
@@ -144,13 +142,27 @@ function Todo({ todo }) {
           </span>
         )}
         {todo.description && (
-          <span className="text-gray-600 text-sm break-words break-all">
+          <span className="text-gray-600 text-sm break-words">
             {todo.description}
           </span>
         )}
       </p>
+      <Button
+        onClick={() => handleDeleteTodo(todo.id)}
+        variant="link"
+        className="w-fit mt-3 px-0 text-red-500"
+      >
+        Delete
+      </Button>
     </div>
   )
+}
+
+function handleDeleteTodo(id: number) {
+  fetch(`http://localhost:3000/todos/${id}`, {
+    method: "DELETE",
+    credentials: "include",
+  })
 }
 
 function Header() {
