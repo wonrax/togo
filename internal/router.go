@@ -27,6 +27,7 @@ func CreateRouter() *chi.Mux {
 
 	r.Post("/signup", HandleUserSignup)
 	r.Post("/login", HandleUserLogin)
+	r.Get("/logout", HandleUserLogout)
 
 	// Protected routes
 	r.Route("/", func(r chi.Router) {

@@ -6,6 +6,7 @@ import useSWR, { useSWRConfig } from "swr"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 
 const fetcher = (url: string) =>
@@ -37,6 +38,8 @@ export default function TodosPage() {
   return (
     <div className="min-w-full max-w-[100vw] min-h-[100vh] flex flex-col items-center px-6 py-16">
       <div className="w-full sm:w-[400px] flex flex-col gap-8">
+        <Header />
+        <Separator />
         <form
           onSubmit={async (e) => {
             const newData = {
@@ -65,25 +68,20 @@ export default function TodosPage() {
               }
             )
           }}
-          className=" flex flex-col gap-5"
+          className="flex flex-col gap-4"
         >
-          <h3 className="text-xl font-extrabold leading-tight tracking-tight md:text-2xl">
+          <h4 className="text-md font-bold leading-tight tracking-tight md:text-lg">
             Add new todo
-          </h3>
-          <div className="flex flex-col gap-4">
-            <div className="grid w-full items-center gap-2">
-              <Label htmlFor="todo-title">Title</Label>
-              <Input type="text" id="todo-title" placeholder="Title" />
-            </div>
-            <div className="grid w-full items-center gap-2">
-              <Label htmlFor="description">Description</Label>
-              <Textarea id="description" placeholder="Description" />
-            </div>
+          </h4>
+          <div className="flex flex-col gap-2">
+            <Input type="text" id="todo-title" placeholder="Title" />
+            <Textarea id="description" placeholder="Description" />
+            <Button type="submit">Add todo</Button>
           </div>
-          <Button type="submit">Add todo</Button>
         </form>
+        <Separator />
         <div className="flex flex-col gap-4">
-          <h3 className="text-xl font-extrabold leading-tight tracking-tight md:text-2xl">
+          <h3 className="text-xl font-bold leading-tight tracking-tight md:text-2xl">
             Your todos
           </h3>
           <Todos isLoading={isLoading} error={error} todos={response?.data} />
@@ -134,18 +132,57 @@ function Todos({ todos, error, isLoading }) {
 
 function Todo({ todo }) {
   return (
-    <div className="p-4 rounded-lg border shadow-sm flex flex-col gap-2">
-      {todo.title && <h5 className="font-bold">{todo.title}</h5>}
+    <div className="p-4 rounded-lg border shadow-sm flex flex-col">
+      {todo.title && <h5 className="font-medium">{todo.title}</h5>}
       <p>
         {todo.updated_at && (
-          <span className="text-sm text-gray-300">
+          <span className="text-gray-600 text-sm">
             {new Date(todo.updated_at).toLocaleDateString("vi-VN") + " "}
           </span>
         )}
         {todo.description && (
-          <span className="break-words break-all">{todo.description}</span>
+          <span className="text-gray-600 text-sm break-words break-all">
+            {todo.description}
+          </span>
         )}
       </p>
     </div>
   )
+}
+
+function Header() {
+  const {
+    data: response,
+    error,
+    isLoading,
+  } = useSWR("http://localhost:3000/me", fetcher)
+  return (
+    <div className="flex flex-row gap-3 w-full items-center py-2 px-3 rounded-lg bg-gray-50 border">
+      <div className="flex flex-col w-full">
+        {!error &&
+          (isLoading ? (
+            <>
+              <div className="animate-pulse h-4 mt-1 max-w-[6rem] bg-gray-200 rounded-md" />
+              <div className="animate-pulse h-4 mt-2 max-w-[12rem] bg-gray-200 rounded-md" />
+            </>
+          ) : (
+            <>
+              <p className="font-medium">{response.data.username}</p>
+              <p className="text-sm text-gray-400">{`Member since ${new Date(
+                response.data.created_at
+              ).toLocaleDateString("en-UK")}`}</p>
+            </>
+          ))}
+      </div>
+      <Button onClick={handleUserLogout}>Logout</Button>
+    </div>
+  )
+}
+
+async function handleUserLogout() {
+  await fetch("http://localhost:3000/logout", {
+    method: "GET",
+    credentials: "include",
+  })
+  window.location.href = "/login"
 }

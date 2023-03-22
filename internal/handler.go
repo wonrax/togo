@@ -161,13 +161,31 @@ func HandleUserLogin(w http.ResponseWriter, r *http.Request) {
 		MaxAge:   31536000, // 1 year
 		Path:     "/",
 		SameSite: http.SameSiteLaxMode,
-		// Domain:   ".localhost:8081",
 	}
 
 	Render(w, r, Response{
 		HTTPStatusCode: http.StatusOK,
 		Cookie:         &cookie,
 		StatusText:     "Login successful",
+	})
+}
+
+func HandleUserLogout(w http.ResponseWriter, r *http.Request) {
+	// Set browser cookie
+	cookie := http.Cookie{
+		Name:     CookieAuthKey,
+		Value:    "",
+		Secure:   false,
+		HttpOnly: true,
+		MaxAge:   -1,
+		Path:     "/",
+		SameSite: http.SameSiteLaxMode,
+	}
+
+	Render(w, r, Response{
+		HTTPStatusCode: http.StatusOK,
+		Cookie:         &cookie,
+		StatusText:     "Logout successful",
 	})
 }
 
