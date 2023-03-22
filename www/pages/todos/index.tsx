@@ -15,6 +15,9 @@ const fetcher = (url: string) =>
     credentials: "include",
   }).then(async (res) => {
     await new Promise((r) => setTimeout(r, 1000))
+    if (res.status === 401) {
+      location.href = "/login"
+    }
     if (!res.ok) {
       throw {
         status: res.status,
