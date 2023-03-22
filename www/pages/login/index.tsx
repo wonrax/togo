@@ -34,6 +34,7 @@ async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
   const password = e.currentTarget.password.value
   const response = await fetch("http://localhost:3000/login", {
     method: "POST",
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
     },

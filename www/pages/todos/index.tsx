@@ -6,7 +6,6 @@ import useSWR, { useSWRConfig } from "swr"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 
 const fetcher = (url: string) =>
@@ -15,6 +14,12 @@ const fetcher = (url: string) =>
     credentials: "include",
   }).then(async (res) => {
     await new Promise((r) => setTimeout(r, 1000))
+    if (!res.ok) {
+      throw {
+        status: res.status,
+        message: res.statusText,
+      }
+    }
     return res.json()
   })
 
@@ -55,6 +60,8 @@ export default function TodosPage() {
               },
               {
                 optimisticData: newData,
+                rollbackOnError: true,
+                revalidate: false,
               }
             )
           }}

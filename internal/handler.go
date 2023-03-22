@@ -10,7 +10,7 @@ import (
 	"go.uber.org/zap"
 )
 
-const CookieAuthKey = "AuthToken"
+const CookieAuthKey = "togo_auth_token"
 
 type userIdContextKey struct{}
 
@@ -156,9 +156,12 @@ func HandleUserLogin(w http.ResponseWriter, r *http.Request) {
 	cookie := http.Cookie{
 		Name:     CookieAuthKey,
 		Value:    token,
-		Secure:   true,
+		Secure:   false,
 		HttpOnly: true,
+		MaxAge:   31536000, // 1 year
+		Path:     "/",
 		SameSite: http.SameSiteLaxMode,
+		// Domain:   ".localhost:8081",
 	}
 
 	Render(w, r, Response{
@@ -170,7 +173,7 @@ func HandleUserLogin(w http.ResponseWriter, r *http.Request) {
 
 func HandleAuthorizeRoute(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		authToken, err := r.Cookie("AuthToken")
+		authToken, err := r.Cookie(CookieAuthKey)
 		if err != nil {
 			Render(w, r, Response{
 				HTTPStatusCode: http.StatusUnauthorized,
