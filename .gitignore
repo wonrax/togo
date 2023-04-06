@@ -19,5 +19,7 @@ out/
 # SQLite database files
 *.db
 
-Air tmp folder
+# Air tmp folder
 /tmp
+
+node_modules/
