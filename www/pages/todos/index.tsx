@@ -1,6 +1,7 @@
 // TODO prevent flash when mutate optimistically
 // sort the data server side so the client doesn't have to do it
 
+import { FormEvent } from "react"
 import useSWR, { useSWRConfig } from "swr"
 
 import { Button } from "@/components/ui/button"
@@ -30,47 +31,67 @@ export default function TodosPage() {
     data: response,
     error,
     isLoading,
-  } = useSWR("http://localhost:3000/todos", fetcher, {
-    keepPreviousData: true,
-  })
+    mutate,
+  } = useSWR("http://localhost:3000/todos", fetcher)
 
-  const { mutate } = useSWRConfig()
+  const handleAddTodo = async (e: FormEvent<HTMLFormElement>) => {
+    const optimisticData = {
+      ...response,
+      data: [
+        ...response.data,
+        {
+          id: Date.now(),
+          title: e.currentTarget["todo-title"].value,
+          description: e.currentTarget.description.value,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          isProcessing: true,
+        },
+      ],
+    }
+    mutate(async () => (await addTodo(e)).json(), {
+      optimisticData: optimisticData,
+      rollbackOnError: true,
+      populateCache: (addedTodo, currentTodos) => {
+        return {
+          ...currentTodos,
+          data: [...currentTodos.data, addedTodo.data],
+        }
+      },
+      revalidate: false,
+    })
+  }
+
+  const handleRemoveTodo = async (id: number) => {
+    const optimisticData = {
+      ...response,
+      data: response.data.map((todo) => {
+        if (todo.id === id) {
+          return {
+            ...todo,
+            isProcessing: true,
+          }
+        }
+        return todo
+      }),
+    }
+    mutate(removeTodo(id), {
+      optimisticData: optimisticData,
+      rollbackOnError: true,
+      populateCache: (_, currentTodos) => ({
+        ...currentTodos,
+        data: currentTodos.data.filter((todo) => todo.id !== id),
+      }),
+      revalidate: false,
+    })
+  }
 
   return (
     <div className="min-w-full max-w-[100vw] min-h-[100vh] flex flex-col items-center px-6 py-16">
       <div className="w-full sm:w-[400px] flex flex-col gap-8">
         <Header />
         <Separator />
-        <form
-          onSubmit={async (e) => {
-            const newData = {
-              ...response,
-              data: [
-                ...response.data,
-                {
-                  id: response.data.length + 2,
-                  title: e.currentTarget["todo-title"].value,
-                  description: e.currentTarget.description.value,
-                  created_at: new Date().toISOString(),
-                  updated_at: new Date().toISOString(),
-                },
-              ],
-            }
-            mutate(
-              "http://localhost:3000/todos",
-              async () => {
-                await handleTodoSubmit(e)
-                return fetcher
-              },
-              {
-                optimisticData: newData,
-                rollbackOnError: true,
-                revalidate: false,
-              }
-            )
-          }}
-          className="flex flex-col gap-4"
-        >
+        <form onSubmit={handleAddTodo} className="flex flex-col gap-4">
           <h4 className="text-md font-bold leading-tight tracking-tight md:text-lg">
             Add new todo
           </h4>
@@ -85,16 +106,19 @@ export default function TodosPage() {
           <h3 className="text-xl font-bold leading-tight tracking-tight md:text-2xl">
             Your todos
           </h3>
-          <Todos isLoading={isLoading} error={error} todos={response?.data} />
+          <Todos
+            isLoading={isLoading}
+            error={error}
+            todos={response?.data}
+            handleRemoveTodo={handleRemoveTodo}
+          />
         </div>
       </div>
     </div>
   )
 }
 
-async function handleTodoSubmit(
-  e: React.FormEvent<HTMLFormElement>
-): Promise<Response> {
+async function addTodo(e: React.FormEvent<HTMLFormElement>): Promise<Response> {
   e.preventDefault()
   const title = e.currentTarget["todo-title"].value
   const description = e.currentTarget.description.value
@@ -108,16 +132,23 @@ async function handleTodoSubmit(
   })
 }
 
-function Todos({ todos, error, isLoading }) {
-  if (isLoading) return <div>We're fetching your todos...</div>
+async function removeTodo(id: number) {
+  return await fetch(`http://localhost:3000/todos/${id}`, {
+    method: "DELETE",
+    credentials: "include",
+  })
+}
+
+function Todos({ todos, error, isLoading, handleRemoveTodo }) {
+  if (isLoading) return <div>We`re fetching your todos...</div>
   if (error)
     return (
       <div className="text-red-500">
         Failed to fetch todos. {JSON.stringify(error)}
       </div>
     )
-  if (!todos) return <p>You don't have any todo! Create one!</p>
-  if (!todos.length) return <p>You don't have any todo! Create one!</p>
+  if (!todos) return <p>You don`t have any todo! Create one!</p>
+  if (!todos.length) return <p>You don`t have any todo! Create one!</p>
   todos.sort(
     (a, b) =>
       new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
@@ -125,44 +156,46 @@ function Todos({ todos, error, isLoading }) {
   return (
     <div className="flex flex-col gap-4">
       {todos.map((todo) => (
-        <Todo key={todo.id} todo={todo} />
+        <Todo
+          key={todo.id}
+          isProcessing={todo.isProcessing}
+          todo={todo}
+          handleRemoveTodo={handleRemoveTodo}
+        />
       ))}
     </div>
   )
 }
 
-function Todo({ todo }) {
+function Todo({ todo, isProcessing, handleRemoveTodo }) {
+  const bgColor = isProcessing ? "bg-gray-100" : "bg-white"
   return (
-    <div className="p-4 rounded-lg border shadow-sm flex flex-col">
+    <div className={`${bgColor} p-4 rounded-lg border shadow-sm flex flex-col`}>
       {todo.title && <h5 className="font-medium">{todo.title}</h5>}
       <p>
         {todo.updated_at && (
           <span className="text-gray-600 text-sm">
-            {new Date(todo.updated_at).toLocaleDateString("vi-VN") + " "}
+            {new Date(todo.updated_at).toLocaleDateString("vi-VN") + " – "}
           </span>
         )}
-        {todo.description && (
+        {todo.description ? (
           <span className="text-gray-600 text-sm break-words">
             {todo.description}
           </span>
+        ) : (
+          <span className="text-gray-400 text-sm">No content</span>
         )}
       </p>
       <Button
-        onClick={() => handleDeleteTodo(todo.id)}
+        onClick={() => handleRemoveTodo(todo.id)}
         variant="link"
         className="w-fit mt-3 px-0 text-red-500"
+        disabled={isProcessing}
       >
         Delete
       </Button>
     </div>
   )
-}
-
-function handleDeleteTodo(id: number) {
-  fetch(`http://localhost:3000/todos/${id}`, {
-    method: "DELETE",
-    credentials: "include",
-  })
 }
 
 function Header() {
