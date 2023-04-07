@@ -2,8 +2,9 @@
 // sort the data server side so the client doesn't have to do it
 
 import { FormEvent } from "react"
+import { useRouter } from "next/router"
 import { AnimatePresence, motion } from "framer-motion"
-import useSWR from "swr"
+import useSWR, { useSWRConfig } from "swr"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -173,7 +174,6 @@ function Todos({ todos, error, isLoading, handleRemoveTodo }) {
   return (
     <div className="flex flex-col gap-4">
       {todos.map((todo) => {
-        if (todo.title === "qwdqw") console.log(todo)
         return (
           <AnimatePresence
             key={todo.id}
@@ -192,12 +192,12 @@ function Todos({ todos, error, isLoading, handleRemoveTodo }) {
 }
 
 function Todo({ todo, isProcessing, handleRemoveTodo }) {
-  const bgColor = isProcessing ? "#fcfcfc" : "white"
+  const bgColor = isProcessing ? "#fafafa" : "#ffffff"
   return (
     <motion.div
       initial={{ height: 0, backgroundColor: bgColor, opacity: 0 }}
       animate={{ height: "auto", backgroundColor: bgColor, opacity: 1 }}
-      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+      transition={{ type: "spring", stiffness: 1000, damping: 40 }}
       exit={{ opacity: 0 }}
       style={{ overflow: "hidden" }}
       className={`rounded-lg border shadow-sm transition-opacity duration-1000`}
@@ -232,11 +232,13 @@ function Todo({ todo, isProcessing, handleRemoveTodo }) {
 }
 
 function Header() {
+  const router = useRouter()
   const {
     data: response,
     error,
     isLoading,
   } = useSWR("http://localhost:3000/me", fetcher)
+  const { mutate } = useSWRConfig()
   return (
     <div className="flex flex-row gap-3 w-full items-center py-2 px-3 rounded-lg bg-gray-50 border">
       <div className="flex flex-col w-full">
@@ -248,22 +250,23 @@ function Header() {
             </>
           ) : (
             <>
-              <p className="font-medium">{response.data.username}</p>
+              <p className="font-medium">{response?.data?.username}</p>
               <p className="text-sm text-gray-400">{`Member since ${new Date(
-                response.data.created_at
+                response?.data?.created_at
               ).toLocaleDateString("en-UK")}`}</p>
             </>
           ))}
       </div>
-      <Button onClick={handleUserLogout}>Logout</Button>
+      <Button onClick={() => handleUserLogout(router, mutate)}>Logout</Button>
     </div>
   )
 }
 
-async function handleUserLogout() {
+async function handleUserLogout(router, mutate) {
   await fetch("http://localhost:3000/logout", {
     method: "GET",
     credentials: "include",
   })
-  window.location.href = "/login"
+  await mutate(() => true, undefined, { revalidate: false })
+  router.push("/login")
 }

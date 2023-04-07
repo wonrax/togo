@@ -1,12 +1,15 @@
+import { useRouter } from "next/router"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 export default function LoginPage() {
+  const router = useRouter()
   return (
     <div className="min-w-full min-h-[100vh] flex flex-col items-center justify-center px-6 py-16">
       <form
-        onSubmit={handleLogin}
+        onSubmit={(e) => handleLogin(e, router)}
         className="min-w-full flex flex-col gap-5 sm:min-w-[320px] -mt-[20vh]"
       >
         <h3 className="text-xl font-extrabold leading-tight tracking-tight md:text-2xl">
@@ -28,7 +31,7 @@ export default function LoginPage() {
   )
 }
 
-async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
+async function handleLogin(e: React.FormEvent<HTMLFormElement>, router) {
   e.preventDefault()
   const username = e.currentTarget.username.value
   const password = e.currentTarget.password.value
@@ -41,6 +44,6 @@ async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     body: JSON.stringify({ username, password }),
   })
   if (response.status === 200) {
-    location.href = "/todos"
+    router.push("/todos")
   }
 }
