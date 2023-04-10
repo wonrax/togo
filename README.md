@@ -3,7 +3,7 @@
 Install dependencies:
 
 ```bash
-npm i && go get
+npm i && go mod download
 ```
 
 Spin up apps:
