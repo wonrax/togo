@@ -192,7 +192,7 @@ function Todo({ todo, isProcessing, handleRemoveTodo }) {
       transition={{ type: "spring", stiffness: 1000, damping: 40 }}
       exit={{ opacity: 0 }}
       style={{ overflow: "hidden" }}
-      className={`rounded-lg border border-gray-200 dark:border-slate-900 shadow-sm transition-opacity duration-1000 bg-white dark:bg-slate-800`}
+      className={`rounded-lg border border-gray-200 dark:border-slate-800 shadow-sm transition-opacity duration-1000 bg-white dark:bg-slate-800`}
     >
       <div className={`p-4 flex flex-col`}>
         {todo.title && <h5 className="font-medium">{todo.title}</h5>}
