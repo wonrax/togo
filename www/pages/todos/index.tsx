@@ -2,9 +2,10 @@
 // sort the data server side so the client doesn't have to do it
 
 import { FormEvent } from "react"
-import { NextRouter, useRouter } from "next/router"
+import { useRouter } from "next/router"
+import { fetcher } from "@/common/fetcher"
 import { AnimatePresence, motion } from "framer-motion"
-import useSWR, { useSWRConfig } from "swr"
+import useSWR from "swr"
 
 import { Layout } from "@/components/layout"
 import { Button } from "@/components/ui/button"
@@ -14,23 +15,6 @@ import { Textarea } from "@/components/ui/textarea"
 
 const NEW_TODO_ANIMATION_DURATION = 0.5
 
-const fetcher = (url: string, router: NextRouter) =>
-  fetch(url, {
-    method: "GET",
-    credentials: "include",
-  }).then(async (res) => {
-    if (res.status === 401) {
-      router.push("/login")
-    }
-    if (!res.ok) {
-      throw {
-        status: res.status,
-        message: res.statusText,
-      }
-    }
-    return res.json()
-  })
-
 export default function TodosPage() {
   const router = useRouter()
   const {
@@ -38,8 +22,13 @@ export default function TodosPage() {
     error,
     isLoading,
     mutate,
-  } = useSWR("http://localhost:3000/todos", (url: string) =>
-    fetcher(url, router)
+  } = useSWR(
+    "http://localhost:3000/todos",
+    (url: string) => fetcher(url, router, true),
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+    }
   )
 
   const handleAddTodo = async (e: FormEvent<HTMLFormElement>) => {
@@ -112,8 +101,6 @@ export default function TodosPage() {
     <Layout>
       <div className="min-w-full max-w-[100vw] min-h-[100vh] flex flex-col items-center px-6 py-16">
         <div className="w-full sm:w-[400px] flex flex-col gap-8">
-          <Header />
-          <Separator />
           <form onSubmit={handleAddTodo} className="flex flex-col gap-4">
             <h4 className="text-md font-bold leading-tight tracking-tight md:text-lg">
               Add new todo
@@ -235,44 +222,4 @@ function Todo({ todo, isProcessing, handleRemoveTodo }) {
       </div>
     </motion.div>
   )
-}
-
-function Header() {
-  const router = useRouter()
-  const {
-    data: response,
-    error,
-    isLoading,
-  } = useSWR("http://localhost:3000/me", fetcher)
-  const { mutate } = useSWRConfig()
-  return (
-    <div className="flex flex-row gap-3 w-full items-center py-2 px-3 rounded-lg bg-gray-50 border dark:bg-gray-800 dark:border-gray-700">
-      <div className="flex flex-col w-full">
-        {!error &&
-          (isLoading ? (
-            <>
-              <div className="animate-pulse h-4 mt-1 max-w-[6rem] bg-gray-200 rounded-md" />
-              <div className="animate-pulse h-4 mt-2 max-w-[12rem] bg-gray-200 rounded-md" />
-            </>
-          ) : (
-            <>
-              <p className="font-medium">{response?.data?.username}</p>
-              <p className="text-sm text-gray-400">{`Member since ${new Date(
-                response?.data?.created_at
-              ).toLocaleDateString("en-UK")}`}</p>
-            </>
-          ))}
-      </div>
-      <Button onClick={() => handleUserLogout(router, mutate)}>Logout</Button>
-    </div>
-  )
-}
-
-async function handleUserLogout(router, mutate) {
-  await fetch("http://localhost:3000/logout", {
-    method: "GET",
-    credentials: "include",
-  })
-  await mutate(() => true, undefined, { revalidate: false })
-  router.push("/login")
 }
