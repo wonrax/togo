@@ -1,3 +1,21 @@
+### Run
+
+Install dependencies:
+
+```bash
+$ npm i && go get
+```
+
+Spin up apps:
+
+```bash
+$ npm run dev
+```
+
+Profit 👍
+
+## Original README
+
 ### Requirements
 
 - Implement one single API which accepts a todo task and records it
