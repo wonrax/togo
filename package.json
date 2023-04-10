@@ -4,12 +4,15 @@
   "description": "- Implement one single API which accepts a todo task and records it   - There is a maximum **limit of N tasks per user** that can be added **per day**.   - Different users can have **different** maximum daily limit. - Write integration (functional) tests - Write unit tests - Choose a suitable architecture to make your code simple, organizable, and maintainable - Using Docker to run locally   - Using Docker for database (if used) is mandatory. - Write a concise README   - How to run your code locally?   - A sample “curl” command to call your API   - How to run your unit tests locally?   - What do you love about your solution?   - What else do you want us to know about however you do not have enough time to complete?",
   "main": "index.js",
   "scripts": {
-    "dev": "(trap 'kill 0' SIGINT; air & npm run dev -w togo)",
+    "dev": "concurrently \"air\" \"npm run dev -w togo\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "workspaces": [
     "www"
-  ]
+  ],
+  "devDependencies": {
+    "concurrently": "^8.0.1"
+  }
 }
