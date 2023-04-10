@@ -12,7 +12,7 @@ func CreateRouter() *chi.Mux {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:8081"}, // Use this to allow specific origin hosts
+		AllowedOrigins:   []string{"http://localhost:8088"}, // Use this to allow specific origin hosts
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"*"},
 		ExposedHeaders:   []string{"Link"},

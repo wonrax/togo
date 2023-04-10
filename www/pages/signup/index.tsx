@@ -6,17 +6,17 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-export default function LoginPage() {
+export default function SignUpPage() {
   const router = useRouter()
   return (
     <Layout>
       <div className="min-w-full min-h-[100vh] flex flex-col items-center justify-center px-6 py-16">
         <form
-          onSubmit={(e) => handleLogin(e, router)}
+          onSubmit={(e) => handleSignup(e, router)}
           className="min-w-full flex flex-col gap-5 sm:min-w-[320px] -mt-[20vh]"
         >
           <h3 className="text-xl font-extrabold leading-tight tracking-tight md:text-2xl">
-            Access to your Togo
+            Create your account
           </h3>
           <div className="flex flex-col gap-4">
             <div className="grid w-full items-center gap-2">
@@ -27,13 +27,21 @@ export default function LoginPage() {
               <Label htmlFor="password">Password</Label>
               <Input type="password" id="password" placeholder="Password" />
             </div>
+            <div className="grid w-full items-center gap-2">
+              <Label htmlFor="confirm">Confirm Password</Label>
+              <Input
+                type="password"
+                id="confirm"
+                placeholder="Confirm Password"
+              />
+            </div>
           </div>
-          <Button type="submit">Login</Button>
+          <Button type="submit">Create my account</Button>
         </form>
         <p className="mt-4 text-sm">
-          Don't have an account?{" "}
-          <Link className="font-bold" href="/signup">
-            Sign up.
+          Already have an account?{" "}
+          <Link className="font-bold" href="/login">
+            Log in.
           </Link>
         </p>
       </div>
@@ -41,11 +49,16 @@ export default function LoginPage() {
   )
 }
 
-async function handleLogin(e: React.FormEvent<HTMLFormElement>, router) {
+async function handleSignup(e: React.FormEvent<HTMLFormElement>, router) {
   e.preventDefault()
   const username = e.currentTarget.username.value
   const password = e.currentTarget.password.value
-  const response = await fetch("http://localhost:3000/login", {
+  const confirm = e.currentTarget.confirm.value
+  if (password !== confirm) {
+    console.log("not match")
+    return
+  }
+  const response = await fetch("http://localhost:3000/signup", {
     method: "POST",
     credentials: "include",
     headers: {
@@ -53,7 +66,7 @@ async function handleLogin(e: React.FormEvent<HTMLFormElement>, router) {
     },
     body: JSON.stringify({ username, password }),
   })
-  if (response.status === 200) {
+  if (response.status === 201) {
     router.push("/todos")
   }
 }

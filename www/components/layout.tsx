@@ -8,7 +8,7 @@ export function Layout({ children }: LayoutProps) {
   return (
     <>
       <SiteHeader />
-      <main>{children}</main>
+      <main className="min-h-[calc(100vh_+_1px)]">{children}</main>
     </>
   )
 }

@@ -88,9 +88,21 @@ func HandleUserSignup(w http.ResponseWriter, r *http.Request) {
 	token := base64.StdEncoding.EncodeToString(
 		[]byte(*userSignupRequest.Username + ":" + *userSignupRequest.Password))
 
+	// Set browser cookie
+	cookie := http.Cookie{
+		Name:     CookieAuthKey,
+		Value:    token,
+		Secure:   false,
+		HttpOnly: true,
+		MaxAge:   31536000, // 1 year
+		Path:     "/",
+		SameSite: http.SameSiteLaxMode,
+	}
+
 	Render(w, r, Response{
 		HTTPStatusCode: http.StatusCreated,
 		Data:           map[string]string{"token": token},
+		Cookie:         &cookie,
 		StatusText:     "User created",
 	})
 }

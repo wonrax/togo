@@ -1,7 +1,6 @@
 import Head from "next/head"
 import Link from "next/link"
 
-import { siteConfig } from "@/config/site"
 import { Layout } from "@/components/layout"
 import { buttonVariants } from "@/components/ui/button"
 
@@ -9,41 +8,29 @@ export default function IndexPage() {
   return (
     <Layout>
       <Head>
-        <title>Next.js</title>
-        <meta
-          name="description"
-          content="Next.js template for building apps with Radix UI and Tailwind CSS"
-        />
+        <title>Togo</title>
+        <meta name="description" content="A bleeding edge todo manager" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <section className="container grid items-center gap-6 pt-6 pb-8 md:py-10">
         <div className="flex max-w-[980px] flex-col items-start gap-2">
-          <h1 className="text-3xl font-extrabold leading-tight tracking-tighter sm:text-3xl md:text-5xl lg:text-6xl">
-            Beautifully designed components <br className="hidden sm:inline" />
-            built with Radix UI and Tailwind CSS.
-          </h1>
+          <h3 className="text-2xl font-extrabold leading-tight tracking-tighter sm:text-2xl md:text-3xl lg:text-4xl">
+            A bleeding edge todo manager
+          </h3>
           <p className="max-w-[700px] text-lg text-slate-700 dark:text-slate-400 sm:text-xl">
-            Accessible and customizable components that you can copy and paste
-            into your apps. Free. Open Source. And Next.js 13 Ready.
+            Add and manage your todo efficiently.
           </p>
         </div>
         <div className="flex gap-4">
-          <Link
-            href={siteConfig.links.docs}
-            target="_blank"
-            rel="noreferrer"
-            className={buttonVariants({ size: "lg" })}
-          >
-            Documentation
+          <Link href="/signup" className={buttonVariants({ size: "lg" })}>
+            Sign up
           </Link>
           <Link
-            target="_blank"
-            rel="noreferrer"
-            href={siteConfig.links.github}
+            href="/login"
             className={buttonVariants({ variant: "outline", size: "lg" })}
           >
-            GitHub
+            Log in
           </Link>
         </div>
       </section>

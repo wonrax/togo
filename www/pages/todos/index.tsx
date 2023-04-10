@@ -2,10 +2,11 @@
 // sort the data server side so the client doesn't have to do it
 
 import { FormEvent } from "react"
-import { useRouter } from "next/router"
+import { NextRouter, useRouter } from "next/router"
 import { AnimatePresence, motion } from "framer-motion"
 import useSWR, { useSWRConfig } from "swr"
 
+import { Layout } from "@/components/layout"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
@@ -13,13 +14,13 @@ import { Textarea } from "@/components/ui/textarea"
 
 const NEW_TODO_ANIMATION_DURATION = 0.5
 
-const fetcher = (url: string) =>
+const fetcher = (url: string, router: NextRouter) =>
   fetch(url, {
     method: "GET",
     credentials: "include",
   }).then(async (res) => {
     if (res.status === 401) {
-      location.href = "/login"
+      router.push("/login")
     }
     if (!res.ok) {
       throw {
@@ -31,12 +32,15 @@ const fetcher = (url: string) =>
   })
 
 export default function TodosPage() {
+  const router = useRouter()
   const {
     data: response,
     error,
     isLoading,
     mutate,
-  } = useSWR("http://localhost:3000/todos", fetcher)
+  } = useSWR("http://localhost:3000/todos", (url: string) =>
+    fetcher(url, router)
+  )
 
   const handleAddTodo = async (e: FormEvent<HTMLFormElement>) => {
     const optimisticData = {
@@ -105,34 +109,36 @@ export default function TodosPage() {
   }
 
   return (
-    <div className="min-w-full max-w-[100vw] min-h-[100vh] flex flex-col items-center px-6 py-16">
-      <div className="w-full sm:w-[400px] flex flex-col gap-8">
-        <Header />
-        <Separator />
-        <form onSubmit={handleAddTodo} className="flex flex-col gap-4">
-          <h4 className="text-md font-bold leading-tight tracking-tight md:text-lg">
-            Add new todo
-          </h4>
-          <div className="flex flex-col gap-2">
-            <Input type="text" id="todo-title" placeholder="Title" />
-            <Textarea id="description" placeholder="Description" />
-            <Button type="submit">Add todo</Button>
+    <Layout>
+      <div className="min-w-full max-w-[100vw] min-h-[100vh] flex flex-col items-center px-6 py-16">
+        <div className="w-full sm:w-[400px] flex flex-col gap-8">
+          <Header />
+          <Separator />
+          <form onSubmit={handleAddTodo} className="flex flex-col gap-4">
+            <h4 className="text-md font-bold leading-tight tracking-tight md:text-lg">
+              Add new todo
+            </h4>
+            <div className="flex flex-col gap-2">
+              <Input type="text" id="todo-title" placeholder="Title" />
+              <Textarea id="description" placeholder="Description" />
+              <Button type="submit">Add todo</Button>
+            </div>
+          </form>
+          <Separator />
+          <div className="flex flex-col gap-4">
+            <h3 className="text-xl font-bold leading-tight tracking-tight md:text-2xl">
+              Your todos
+            </h3>
+            <Todos
+              isLoading={isLoading}
+              error={error}
+              todos={response?.data}
+              handleRemoveTodo={handleRemoveTodo}
+            />
           </div>
-        </form>
-        <Separator />
-        <div className="flex flex-col gap-4">
-          <h3 className="text-xl font-bold leading-tight tracking-tight md:text-2xl">
-            Your todos
-          </h3>
-          <Todos
-            isLoading={isLoading}
-            error={error}
-            todos={response?.data}
-            handleRemoveTodo={handleRemoveTodo}
-          />
         </div>
       </div>
-    </div>
+    </Layout>
   )
 }
 
@@ -240,7 +246,7 @@ function Header() {
   } = useSWR("http://localhost:3000/me", fetcher)
   const { mutate } = useSWRConfig()
   return (
-    <div className="flex flex-row gap-3 w-full items-center py-2 px-3 rounded-lg bg-gray-50 border">
+    <div className="flex flex-row gap-3 w-full items-center py-2 px-3 rounded-lg bg-gray-50 border dark:bg-gray-800 dark:border-gray-700">
       <div className="flex flex-col w-full">
         {!error &&
           (isLoading ? (
