@@ -185,26 +185,25 @@ function Todos({ todos, error, isLoading, handleRemoveTodo }) {
 }
 
 function Todo({ todo, isProcessing, handleRemoveTodo }) {
-  const bgColor = isProcessing ? "#fafafa" : "#ffffff"
   return (
     <motion.div
-      initial={{ height: 0, backgroundColor: bgColor, opacity: 0 }}
-      animate={{ height: "auto", backgroundColor: bgColor, opacity: 1 }}
+      initial={{ height: 0, opacity: 0 }}
+      animate={{ height: "auto", opacity: 1 }}
       transition={{ type: "spring", stiffness: 1000, damping: 40 }}
       exit={{ opacity: 0 }}
       style={{ overflow: "hidden" }}
-      className={`rounded-lg border shadow-sm transition-opacity duration-1000`}
+      className={`rounded-lg border border-gray-200 dark:border-slate-900 shadow-sm transition-opacity duration-1000 bg-white dark:bg-slate-800`}
     >
       <div className={`p-4 flex flex-col`}>
         {todo.title && <h5 className="font-medium">{todo.title}</h5>}
         <p>
           {todo.updated_at && (
-            <span className="text-gray-600 text-sm">
+            <span className="text-gray-500 text-sm">
               {new Date(todo.updated_at).toLocaleDateString("vi-VN") + " – "}
             </span>
           )}
           {todo.description ? (
-            <span className="text-gray-600 text-sm break-words">
+            <span className="text-gray-500 text-sm break-words">
               {todo.description}
             </span>
           ) : (
@@ -214,7 +213,7 @@ function Todo({ todo, isProcessing, handleRemoveTodo }) {
         <Button
           onClick={() => handleRemoveTodo(todo.id)}
           variant="link"
-          className="w-fit mt-3 px-0 text-red-500"
+          className="w-fit mt-3 px-0 text-red-500 dark:text-red-500"
           disabled={isProcessing}
         >
           Delete

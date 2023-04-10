@@ -1,22 +1,7 @@
 import { useRouter } from "next/router"
 import { fetcher } from "@/common/fetcher"
 import { Avatar, AvatarFallback } from "@radix-ui/react-avatar"
-import {
-  Cloud,
-  CreditCard,
-  Github,
-  Keyboard,
-  LifeBuoy,
-  LogOut,
-  Mail,
-  MessageSquare,
-  Plus,
-  PlusCircle,
-  Settings,
-  User,
-  UserPlus,
-  Users,
-} from "lucide-react"
+import { LogOut } from "lucide-react"
 import useSWR, { useSWRConfig } from "swr"
 
 import { siteConfig } from "@/config/site"
@@ -29,12 +14,7 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
@@ -44,9 +24,9 @@ export function SiteHeader() {
       <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
         <MainNav items={siteConfig.mainNav} />
         <div className="flex flex-1 items-center justify-end space-x-4">
-          <nav className="flex items-center space-x-1">
+          <nav className="flex items-center space-x-4">
             <ThemeToggle />
-            <Header />
+            <Profile />
           </nav>
         </div>
       </div>
@@ -54,7 +34,7 @@ export function SiteHeader() {
   )
 }
 
-function Header() {
+function Profile() {
   const router = useRouter()
   const {
     data: response,
@@ -70,12 +50,14 @@ function Header() {
     !(error || isLoading) && (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Avatar className="rounded-full aspect-square bg-gray-100 h-10 flex items-center justify-center border border-gray-200 cursor-pointer">
-            {response?.data?.username
-              ? response.data.username[0].toUpperCase()
-              : "U"}
-            <AvatarFallback>{}</AvatarFallback>
-          </Avatar>
+          <button>
+            <Avatar className="rounded-full aspect-square bg-gray-100 dark:bg-gray-800 h-10 flex items-center justify-center border border-gray-200 dark:border-gray-700 cursor-pointer">
+              {response?.data?.username
+                ? response.data.username[0].toUpperCase()
+                : "U"}
+              <AvatarFallback>{}</AvatarFallback>
+            </Avatar>
+          </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56" align="end">
           <DropdownMenuLabel>

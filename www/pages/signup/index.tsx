@@ -21,7 +21,12 @@ export default function SignUpPage() {
           <div className="flex flex-col gap-4">
             <div className="grid w-full items-center gap-2">
               <Label htmlFor="username">Username</Label>
-              <Input type="text" id="username" placeholder="Username" />
+              <Input
+                type="text"
+                id="username"
+                placeholder="Username"
+                autoFocus
+              />
             </div>
             <div className="grid w-full items-center gap-2">
               <Label htmlFor="password">Password</Label>
