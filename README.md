@@ -3,14 +3,16 @@
 Install dependencies:
 
 ```bash
-$ npm i && go get
+npm i && go get
 ```
 
 Spin up apps:
 
 ```bash
-$ npm run dev
+npm run dev
 ```
+
+Open browser, go to `http://localhost:8088`
 
 Profit 👍
 
