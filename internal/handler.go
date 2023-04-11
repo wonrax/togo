@@ -92,11 +92,11 @@ func HandleUserSignup(w http.ResponseWriter, r *http.Request) {
 	cookie := http.Cookie{
 		Name:     CookieAuthKey,
 		Value:    token,
-		Secure:   false,
+		Secure:   true,
 		HttpOnly: true,
 		MaxAge:   31536000, // 1 year
 		Path:     "/",
-		SameSite: http.SameSiteLaxMode,
+		SameSite: http.SameSiteNoneMode,
 	}
 
 	Render(w, r, Response{
@@ -170,11 +170,11 @@ func HandleUserLogin(w http.ResponseWriter, r *http.Request) {
 	cookie := http.Cookie{
 		Name:     CookieAuthKey,
 		Value:    token,
-		Secure:   false,
+		Secure:   true,
 		HttpOnly: true,
 		MaxAge:   31536000, // 1 year
 		Path:     "/",
-		SameSite: http.SameSiteLaxMode,
+		SameSite: http.SameSiteNoneMode,
 	}
 
 	Render(w, r, Response{
@@ -189,11 +189,11 @@ func HandleUserLogout(w http.ResponseWriter, r *http.Request) {
 	cookie := http.Cookie{
 		Name:     CookieAuthKey,
 		Value:    "",
-		Secure:   false,
+		Secure:   true,
 		HttpOnly: true,
 		MaxAge:   -1,
 		Path:     "/",
-		SameSite: http.SameSiteLaxMode,
+		SameSite: http.SameSiteNoneMode,
 	}
 
 	Render(w, r, Response{
