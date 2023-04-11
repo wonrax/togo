@@ -21,7 +21,7 @@ type BasicAuthConfig struct {
 func NewBasicAuthConfig() *BasicAuthConfig {
 	return &BasicAuthConfig{
 		argonConfig: &Argon2Params{
-			memory:      64 * 1024, // 64MB
+			memory:      1024, // 1MB
 			iterations:  1,
 			parallelism: 2,
 			keyLength:   32,
