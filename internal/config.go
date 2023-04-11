@@ -11,9 +11,9 @@ var Db *sqlx.DB
 var Log *zap.Logger
 var basicAuthConfig *BasicAuthConfig
 
-func InitGlobalConfig(d *sqlx.DB) {
+func InitGlobalConfig(env string, d *sqlx.DB) {
 	initDb(d)
-	initLogger()
+	initLogger(env)
 	initBasicAuthConfig()
 }
 
