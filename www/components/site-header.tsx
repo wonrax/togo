@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { useRouter } from "next/router"
 import AppConfig from "@/common/config"
 import { fetcher } from "@/common/fetcher"
@@ -8,6 +9,7 @@ import useSWR, { useSWRConfig } from "swr"
 import { siteConfig } from "@/config/site"
 import { MainNav } from "@/components/main-nav"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { buttonVariants } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -46,46 +48,49 @@ function Profile() {
     shouldRetryOnError: false,
   })
   const { mutate } = useSWRConfig()
-  return (
-    !(error || isLoading) && (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <button>
-            <Avatar className="rounded-full aspect-square bg-gray-100 dark:bg-gray-800 h-10 flex items-center justify-center border border-gray-200 dark:border-gray-700 cursor-pointer">
-              {response?.data?.username
-                ? response.data.username[0].toUpperCase()
-                : "U"}
-              <AvatarFallback>{}</AvatarFallback>
-            </Avatar>
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56" align="end">
-          <DropdownMenuLabel>
-            <div className="flex flex-col">
-              <p className="text-base">
-                {response?.data?.username
-                  ? response.data.username
-                  : "My Account"}
-              </p>
-              <p className="font-normal text-gray-500">
-                {response?.data?.created_at
-                  ? `Member since ${new Date(
-                      response?.data?.created_at
-                    ).toLocaleDateString("en-UK")}`
-                  : "Member"}
-              </p>
-            </div>
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            <DropdownMenuItem onSelect={() => handleUserLogout(router, mutate)}>
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>Logout</span>
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    )
+  return !(error || isLoading) ? (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button>
+          <Avatar className="rounded-full aspect-square bg-gray-100 dark:bg-gray-800 h-10 flex items-center justify-center border border-gray-200 dark:border-gray-700 cursor-pointer">
+            {response?.data?.username
+              ? response.data.username[0].toUpperCase()
+              : "U"}
+            <AvatarFallback>{}</AvatarFallback>
+          </Avatar>
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56" align="end">
+        <DropdownMenuLabel>
+          <div className="flex flex-col">
+            <p className="text-base">
+              {response?.data?.username ? response.data.username : "My Account"}
+            </p>
+            <p className="font-normal text-gray-500">
+              {response?.data?.created_at
+                ? `Member since ${new Date(
+                    response?.data?.created_at
+                  ).toLocaleDateString("en-UK")}`
+                : "Member"}
+            </p>
+          </div>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem onSelect={() => handleUserLogout(router, mutate)}>
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Logout</span>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  ) : (
+    <Link
+      href="/login"
+      className={buttonVariants({ size: "lg", variant: "default" })}
+    >
+      Sign in
+    </Link>
   )
 }
 
