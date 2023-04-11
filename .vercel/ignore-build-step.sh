@@ -4,7 +4,7 @@ echo "VERCEL_GIT_COMMIT_REF: $VERCEL_GIT_COMMIT_REF"
 
 if [[ "$VERCEL_GIT_COMMIT_REF" == "master" ]] ; then
     # Depends on whether the files changed or not
-    git diff HEAD^ HEAD --quiet .
+    git diff HEAD^ HEAD --quiet www/
 
 else
     # Don't build
