@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
@@ -34,12 +33,7 @@ func main() {
 	togo.DBMigrate()
 
 	// ROUTING
-	env := os.Getenv("ENVIRONMENT")
 	port := "3000"
-	if env == "production" {
-		port = "8080"
-	}
-
 	togo.Log.Info("Starting server on port " + port)
 	http.ListenAndServe(":"+port, togo.CreateRouter())
 }
