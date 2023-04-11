@@ -11,7 +11,7 @@ COPY . ./
 RUN go build -o /hi-tracking
 
 ## Deploy
-FROM gcr.io/distroless/base-debian10
+FROM alpine:3
 WORKDIR /
 COPY --from=build /hi-tracking /hi-tracking
 ENTRYPOINT ["/hi-tracking"]
