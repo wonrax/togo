@@ -10,14 +10,14 @@ import (
 )
 
 func CreateRouter() *chi.Mux {
-	wwwUrl := os.Getenv("WWW-URL")
-	if wwwUrl == "" {
-		wwwUrl = "http://localhost:8088"
+	appURL := os.Getenv("APP_URL")
+	if appURL == "" {
+		appURL = "http://localhost:8088"
 	}
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{wwwUrl}, // Use this to allow specific origin hosts
+		AllowedOrigins:   []string{appURL}, // Use this to allow specific origin hosts
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"*"},
 		ExposedHeaders:   []string{"Link"},
