@@ -1,0 +1,7 @@
+# fly.toml file generated for togo on 2023-04-11T11:26:56+07:00
+
+app = "togo"
+primary_region = "sin"
+
+[build]
+  dockerfile = "Dockerfile-server"

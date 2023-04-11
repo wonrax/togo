@@ -72,6 +72,7 @@ async function handleSignup(e: React.FormEvent<HTMLFormElement>, router) {
     body: JSON.stringify({ username, password }),
   })
   if (response.status === 201) {
+    // todo revalidate header profile
     router.push("/todos")
   }
 }

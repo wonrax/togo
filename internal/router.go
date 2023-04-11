@@ -2,6 +2,7 @@ package togo
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -9,10 +10,14 @@ import (
 )
 
 func CreateRouter() *chi.Mux {
+	wwwUrl := os.Getenv("WWW-URL")
+	if wwwUrl == "" {
+		wwwUrl = "http://localhost:8088"
+	}
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:8088"}, // Use this to allow specific origin hosts
+		AllowedOrigins:   []string{wwwUrl}, // Use this to allow specific origin hosts
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"*"},
 		ExposedHeaders:   []string{"Link"},
