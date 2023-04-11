@@ -1,4 +1,5 @@
 import { useRouter } from "next/router"
+import AppConfig from "@/common/config"
 import { fetcher } from "@/common/fetcher"
 import { Avatar, AvatarFallback } from "@radix-ui/react-avatar"
 import { LogOut } from "lucide-react"
@@ -39,7 +40,7 @@ function Profile() {
     data: response,
     error,
     isLoading,
-  } = useSWR("http://localhost:3000/me", fetcher, {
+  } = useSWR(`${AppConfig.API_URL}/me`, fetcher, {
     revalidateIfStale: false,
     revalidateOnFocus: false,
     shouldRetryOnError: false,
@@ -89,7 +90,7 @@ function Profile() {
 }
 
 async function handleUserLogout(router, mutate) {
-  await fetch("http://localhost:3000/logout", {
+  await fetch(`${AppConfig.API_URL}/logout`, {
     method: "GET",
     credentials: "include",
   })

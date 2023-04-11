@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { useRouter } from "next/router"
+import AppConfig from "@/common/config"
 
 import { Layout } from "@/components/layout"
 import { Button } from "@/components/ui/button"
@@ -63,7 +64,7 @@ async function handleSignup(e: React.FormEvent<HTMLFormElement>, router) {
     console.log("not match")
     return
   }
-  const response = await fetch("http://localhost:3000/signup", {
+  const response = await fetch(`${AppConfig.API_URL}/signup`, {
     method: "POST",
     credentials: "include",
     headers: {

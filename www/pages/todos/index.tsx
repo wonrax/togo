@@ -3,6 +3,7 @@
 
 import { FormEvent } from "react"
 import { useRouter } from "next/router"
+import AppConfig from "@/common/config"
 import { fetcher } from "@/common/fetcher"
 import { AnimatePresence, motion } from "framer-motion"
 import useSWR from "swr"
@@ -23,7 +24,7 @@ export default function TodosPage() {
     isLoading,
     mutate,
   } = useSWR(
-    "http://localhost:3000/todos",
+    `${AppConfig.API_URL}/todos`,
     (url: string) => fetcher(url, router, true),
     {
       revalidateIfStale: false,
@@ -133,7 +134,7 @@ async function addTodo(e: React.FormEvent<HTMLFormElement>): Promise<Response> {
   e.preventDefault()
   const title = e.currentTarget["todo-title"].value
   const description = e.currentTarget.description.value
-  return await fetch("http://localhost:3000/todos", {
+  return await fetch(`${AppConfig.API_URL}/todos`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -144,7 +145,7 @@ async function addTodo(e: React.FormEvent<HTMLFormElement>): Promise<Response> {
 }
 
 async function removeTodo(id: number) {
-  return await fetch(`http://localhost:3000/todos/${id}`, {
+  return await fetch(`${AppConfig.API_URL}/todos/${id}`, {
     method: "DELETE",
     credentials: "include",
   })

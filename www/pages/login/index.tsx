@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { useRouter } from "next/router"
+import AppConfig from "@/common/config"
 import { useSWRConfig } from "swr"
 
 import { Layout } from "@/components/layout"
@@ -38,7 +39,7 @@ export default function LoginPage() {
           <Button type="submit">Login</Button>
         </form>
         <p className="mt-4 text-sm">
-          Don't have an account?{" "}
+          Don`t have an account?{" "}
           <Link className="font-bold" href="/signup">
             Sign up.
           </Link>
@@ -56,7 +57,7 @@ async function handleLogin(
   e.preventDefault()
   const username = e.currentTarget.username.value
   const password = e.currentTarget.password.value
-  const response = await fetch("http://localhost:3000/login", {
+  const response = await fetch(`${AppConfig.API_URL}/login`, {
     method: "POST",
     credentials: "include",
     headers: {
@@ -66,6 +67,6 @@ async function handleLogin(
   })
   if (response.status === 200) {
     router.push("/todos")
-    mutate("http://localhost:3000/me") // refresh current user
+    mutate(`${AppConfig.API_URL}/me`) // refresh current user
   }
 }
