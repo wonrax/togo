@@ -11,7 +11,7 @@ COPY . ./
 RUN go build -o /hi-tracking
 
 ## Deploy
-FROM ubuntu:22
+FROM ubuntu:22.04
 WORKDIR /
 COPY --from=build /hi-tracking /hi-tracking
 ENTRYPOINT ["/hi-tracking"]
