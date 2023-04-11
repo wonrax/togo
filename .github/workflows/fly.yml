@@ -8,6 +8,8 @@ on:
       - '**.go'
       - 'go.mod'
       - 'go.sum'
+      - 'fly.toml'
+      - 'Dockerfile-server'
 jobs:
   deploy:
     name: Deploy app

@@ -8,7 +8,7 @@ COPY go.sum ./
 RUN go mod download
 
 COPY . ./
-RUN go build -o /hi-tracking
+RUN go build -buildvcs=false -o /hi-tracking
 
 ## Deploy
 FROM gcr.io/distroless/base-debian10
