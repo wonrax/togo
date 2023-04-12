@@ -10,7 +10,6 @@ func initLogger(env string) error {
 	logConfig.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 	if env == "production" || env == "test" {
 		logConfig = zap.NewProductionConfig()
-		logConfig.EncoderConfig.EncodeLevel = zapcore.LowercaseLevelEncoder
 	}
 
 	var err error

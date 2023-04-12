@@ -23,3 +23,5 @@ out/
 /tmp
 
 node_modules/
+
+.env

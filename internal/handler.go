@@ -282,11 +282,9 @@ func HandleGetUserInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err_ := DbFind(
-		map[string]interface{}{"id": userId},
-		[]string{"username", "created_at"},
-		"users",
-	)
+	var user UserInfo
+	err_ := Db.Get(&user, "SELECT * FROM users WHERE id = ?", userId)
+
 	if err_ != nil {
 		Log.Error(
 			"Something went wrong when looking for a user",
@@ -297,18 +295,14 @@ func HandleGetUserInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(user) == 0 {
-		Log.Error(
-			"Somehow this user does not exist anymore???",
-			zap.Int64("userId", userId),
-			zap.Error(err_),
-		)
-		w.WriteHeader(http.StatusBadRequest)
+	if *user.Username == Config.AdminUsername {
+		hasSuperPower := true
+		user.HasSuperPower = &hasSuperPower
 	}
 
 	Render(w, r, Response{
 		HTTPStatusCode: http.StatusOK,
-		Data:           user[0],
+		Data:           user,
 		StatusText:     "success",
 	})
 }

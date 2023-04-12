@@ -2,7 +2,6 @@ package togo
 
 import (
 	"net/http"
-	"os"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -10,9 +9,10 @@ import (
 )
 
 func CreateRouter() *chi.Mux {
-	appURL := os.Getenv("APP_URL")
+	appURL := Config.AppURL
 	if appURL == "" {
 		appURL = "http://localhost:8088"
+		Log.Warn("APP_URL environment variable not set. Defaulting to " + appURL)
 	}
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
