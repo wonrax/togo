@@ -1,4 +1,4 @@
-![togo screenshot](https://user-images.githubusercontent.com/28887874/230879219-1c9d8ddf-673c-4deb-bb5e-17f33762de60.png)
+![togo screenshot](https://user-images.githubusercontent.com/28887874/231498577-19b4b816-19e3-4c5f-ac6c-6ec3ba36868a.png)
 
 ### Run
 
