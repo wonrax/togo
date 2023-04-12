@@ -5,9 +5,10 @@ import { FormEvent } from "react"
 import { useRouter } from "next/router"
 import AppConfig from "@/common/config"
 import { fetcher } from "@/common/fetcher"
-import { AnimatePresence, motion } from "framer-motion"
+import { AnimatePresence } from "framer-motion"
 import useSWR from "swr"
 
+import Todo from "@/components/Todo"
 import { Layout } from "@/components/layout"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -182,44 +183,5 @@ function Todos({ todos, error, isLoading, handleRemoveTodo }) {
         )
       })}
     </div>
-  )
-}
-
-function Todo({ todo, isProcessing, handleRemoveTodo }) {
-  return (
-    <motion.div
-      initial={{ height: 0, opacity: 0 }}
-      animate={{ height: "auto", opacity: 1 }}
-      transition={{ type: "spring", stiffness: 1000, damping: 40 }}
-      exit={{ opacity: 0 }}
-      style={{ overflow: "hidden" }}
-      className={`rounded-lg border border-gray-200 dark:border-slate-800 shadow-sm transition-opacity duration-1000 bg-white dark:bg-slate-800`}
-    >
-      <div className={`p-4 flex flex-col`}>
-        {todo.title && <h5 className="font-medium">{todo.title}</h5>}
-        <p>
-          {todo.updated_at && (
-            <span className="text-gray-500 text-sm">
-              {new Date(todo.updated_at).toLocaleDateString("vi-VN") + " – "}
-            </span>
-          )}
-          {todo.description ? (
-            <span className="text-gray-500 text-sm break-words">
-              {todo.description}
-            </span>
-          ) : (
-            <span className="text-gray-400 text-sm">No content</span>
-          )}
-        </p>
-        <Button
-          onClick={() => handleRemoveTodo(todo.id)}
-          variant="link"
-          className="w-fit mt-3 px-0 text-red-500 dark:text-red-500"
-          disabled={isProcessing}
-        >
-          Delete
-        </Button>
-      </div>
-    </motion.div>
   )
 }
