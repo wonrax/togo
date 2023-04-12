@@ -6,7 +6,7 @@ import { ArrowRight } from "lucide-react"
 import useSWR from "swr"
 
 import { Layout } from "@/components/layout"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { buttonVariants } from "@/components/ui/button"
 
 export default function IndexPage() {
   return (

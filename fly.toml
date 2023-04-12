@@ -8,7 +8,7 @@ primary_region = "sin"
 
 [env]
   ENVIRONMENT = "production"
-  APP_URL = "https://togo-www.vercel.app"
+  APP_URL = "https://togo.hhai.dev"
 
 [[services]]
   internal_port = 3000
