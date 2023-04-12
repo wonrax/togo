@@ -62,9 +62,6 @@ func Start(environment string) {
 func addAdminUser(u *UserCredentials) error {
 	adminUser := User{}
 	err := Db.Get(&adminUser, "SELECT * FROM users WHERE username = ?", u.Username)
-	if err != nil {
-		return err
-	}
 
 	key, salt := basicAuthConfig.HashPassword(*u.Password)
 	// generate iso 8601 timestamp for updated_at
