@@ -6,9 +6,14 @@ primary_region = "sin"
 [build]
   dockerfile = "Dockerfile-server"
 
+[mounts]
+  source="togo_data"
+  destination="/data"
+
 [env]
   ENVIRONMENT = "production"
   APP_URL = "https://togo.hhai.dev"
+  DATABASE_PATH = "/data/togo.db"
 
 [[services]]
   internal_port = 3000
