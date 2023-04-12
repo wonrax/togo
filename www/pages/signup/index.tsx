@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { useRouter } from "next/router"
 import AppConfig from "@/common/config"
+import { useSWRConfig } from "swr"
 
 import { Layout } from "@/components/layout"
 import { Button } from "@/components/ui/button"
@@ -9,11 +10,12 @@ import { Label } from "@/components/ui/label"
 
 export default function SignUpPage() {
   const router = useRouter()
+  const { mutate } = useSWRConfig()
   return (
     <Layout>
       <div className="min-w-full min-h-[100vh] flex flex-col items-center justify-center px-6 py-16">
         <form
-          onSubmit={(e) => handleSignup(e, router)}
+          onSubmit={(e) => handleSignup(e, router, mutate)}
           className="min-w-full flex flex-col gap-5 sm:min-w-[320px] -mt-[20vh]"
         >
           <h3 className="text-xl font-extrabold leading-tight tracking-tight md:text-2xl">
@@ -55,7 +57,11 @@ export default function SignUpPage() {
   )
 }
 
-async function handleSignup(e: React.FormEvent<HTMLFormElement>, router) {
+async function handleSignup(
+  e: React.FormEvent<HTMLFormElement>,
+  router,
+  mutate
+) {
   e.preventDefault()
   const username = e.currentTarget.username.value
   const password = e.currentTarget.password.value
@@ -73,7 +79,7 @@ async function handleSignup(e: React.FormEvent<HTMLFormElement>, router) {
     body: JSON.stringify({ username, password }),
   })
   if (response.status === 201) {
-    // todo revalidate header profile
     router.push("/todos")
+    mutate(`${AppConfig.API_URL}/me`) // refresh current user
   }
 }

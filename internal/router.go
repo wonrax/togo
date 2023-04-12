@@ -42,6 +42,14 @@ func CreateRouter() *chi.Mux {
 		r.Put("/todos", HandleCreateTodo)
 		r.Get("/todos", HandleGetTodoList)
 		r.Delete("/todos/{id}", HandleDeleteTodo)
+
+		r.Route("/admin", func(r chi.Router) {
+			r.Use(HandleAuthorizeAdminRoute)
+			r.Get("/users", HandleGetUserList)
+			// r.Get("/users/{id}", HandleGetUserInfo) TODO
+			// r.Put("/users/{id}", HandleUpdateUser) TODO
+			// r.Delete("/users/{id}", HandleDeleteUser) TODO
+		})
 	})
 
 	return r
