@@ -35,8 +35,12 @@ func HandleAuthorizeAdminRoute(next http.Handler) http.Handler {
 }
 
 func HandleGetUserList(w http.ResponseWriter, r *http.Request) {
-	var users []UserInfo
-	err := Db.Select(&users, "SELECT * FROM users")
+	var users []UserInfoAdmin
+	err := Db.Select(&users, `
+		SELECT u.id, u.username, u.created_at, count FROM users u INNER JOIN 
+		( SELECT todos.owner, COUNT(*) count FROM todos GROUP BY todos.owner ) todo_count
+		ON u.id = todo_count.owner;
+	`)
 	if err != nil {
 		Log.Error("Could not get users from database", zap.Error(err))
 		w.WriteHeader(http.StatusInternalServerError)

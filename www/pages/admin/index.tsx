@@ -30,7 +30,7 @@ export default function AdminPage() {
   return (
     <Layout>
       <div className="min-w-full max-w-[100vw] min-h-[100vh] flex flex-col items-center px-6 py-16">
-        <div className="w-full sm:w-[800px] flex flex-col gap-4">
+        <div className="w-full lg:w-[1024px] flex flex-col gap-4">
           <p className="text-xl md:text-2xl font-bold">Users</p>
           {!error && !isLoading && <Data data={response?.data} />}
         </div>
@@ -41,6 +41,7 @@ export default function AdminPage() {
 type User = {
   username: string
   created_at: string
+  todo_count: number
 }
 
 const columnHelper = createColumnHelper<User>()
@@ -54,6 +55,10 @@ const columns = [
     header: () => "Created at",
     cell: (info) => new Date(info.getValue()).toLocaleDateString("en-UK"),
   }),
+  columnHelper.accessor("todo_count", {
+    header: "Todo count",
+    cell: (info) => info.getValue(),
+  }),
 ]
 
 function Data({ data }) {
@@ -64,20 +69,20 @@ function Data({ data }) {
   })
 
   return (
-    <table className="border-collapse w-full dark:bg-slate-800 text-sm">
+    <table className="border-separate border-spacing-0 w-full dark:bg-slate-800 text-sm">
       <thead>
         {table.getHeaderGroups().map((headerGroup) => (
-          <tr className="bg-gray-100" key={headerGroup.id}>
+          <tr className="bg-gray-50" key={headerGroup.id}>
             {headerGroup.headers.map((header, index) => {
-              let borderRadius = "border-y"
-              if (index === 0) borderRadius = " rounded-l border-l border-y"
+              let borderRadius = " border-y"
+              if (index === 0) borderRadius = " rounded-l-md border-l border-y"
               else if (index === headerGroup.headers.length - 1)
-                borderRadius = " rounded-r border-r border-y"
+                borderRadius = " rounded-r-md border-r border-y"
               return (
                 <th
                   key={header.id}
                   className={
-                    "w-1/2 font-semibold p-4 text-slate-900 dark:text-slate-200 text-left border-separate" +
+                    "w-1/2 whitespace-nowrap font-semibold p-4 text-slate-900 dark:text-slate-200 text-left border-separate" +
                     borderRadius
                   }
                 >
@@ -96,13 +101,15 @@ function Data({ data }) {
       <tbody>
         {table.getRowModel().rows.map((row, index) => {
           const border =
-            index === 0 ? "" : "border-t border-slate-300 dark:border-slate-700"
+            index === 0
+              ? ""
+              : " border-t border-slate-300 dark:border-slate-700"
           return (
-            <tr className={border} key={row.id}>
+            <tr key={row.id}>
               {row.getVisibleCells().map((cell) => (
                 <td
                   key={cell.id}
-                  className="p-4 text-slate-500 dark:text-slate-400"
+                  className={"p-4 text-slate-500 dark:text-slate-400" + border}
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>

@@ -38,6 +38,14 @@ type UserInfo struct {
 	HasSuperPower *bool `json:"has_super_power,omitempty"`
 }
 
+type UserInfoAdmin struct {
+	*UserInfo
+
+	ID        *int64  `json:"id" db:"id"`
+	TodoCount *string `json:"todo_count" db:"count"`
+	UpdatedAt *string `json:"updated_at" db:"updated_at"`
+}
+
 type Todo struct {
 	ID          *int64  `json:"id" db:"id"`
 	Owner       *int64  `json:"owner" db:"owner"`
